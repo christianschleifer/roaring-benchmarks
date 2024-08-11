@@ -1,4 +1,4 @@
 pub use dataset::Dataset;
-pub use dataset::INSTANCE;
+pub use dataset::DATASETS;
 
 mod dataset;

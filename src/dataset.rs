@@ -19,7 +19,7 @@ const DATASET_FILENAMES: &[&str] = &[
     "wikileaks-noquotes_srt.zip",
 ];
 
-pub static INSTANCE: LazyLock<Vec<Dataset>> =
+pub static DATASETS: LazyLock<Vec<Dataset>> =
     LazyLock::new(|| parse_datasets().expect("could not parse datasets"));
 
 pub struct Dataset {
