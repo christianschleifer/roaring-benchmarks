@@ -12,5 +12,5 @@ tracing = "0.1"
 zip = "2"
 
 [[bench]]
-name = "add"
+name = "multi_union"
 harness = false
