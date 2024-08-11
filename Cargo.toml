@@ -10,3 +10,7 @@ croaring = "2"
 roaring = "0.10"
 tracing = "0.1"
 zip = "2"
+
+[[bench]]
+name = "add"
+harness = false
