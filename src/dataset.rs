@@ -5,6 +5,8 @@ use std::path::PathBuf;
 use std::sync::LazyLock;
 use std::time::Instant;
 
+use croaring::Bitmap;
+use roaring::RoaringBitmap;
 use tracing::info;
 use zip::ZipArchive;
 
@@ -34,6 +36,17 @@ impl Dataset {
 
     pub fn data(&self) -> &[Vec<u32>] {
         &self.data
+    }
+
+    pub fn to_croaring_bitmaps(&self) -> Vec<croaring::Bitmap> {
+        self.data
+            .iter()
+            .map(|vec| Bitmap::from(vec.as_slice()))
+            .collect()
+    }
+
+    pub fn to_roaring_bitmaps(&self) -> Vec<roaring::RoaringBitmap> {
+        self.data.iter().map(RoaringBitmap::from_iter).collect()
     }
 }
 
