@@ -4,3 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+anyhow = "1"
+criterion = "0.5"
+tracing = "0.1"
+zip = "2"
