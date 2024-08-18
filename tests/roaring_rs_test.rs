@@ -1,7 +1,9 @@
+use roaring::MultiOps;
 use roaring_benchmarks::DATASETS;
+use std::ops::{BitAnd, BitOr};
 
 #[test]
-fn it_computes_expected_results() {
+fn it_computes_contains() {
     let datasets = &DATASETS;
 
     for dataset in datasets.iter() {
@@ -33,5 +35,55 @@ fn it_computes_expected_results() {
             dataset.expected_results().contains_third_quartile_value(),
             third_quartile_results
         );
+    }
+}
+
+#[test]
+fn it_computes_successive_intersections() {
+    let datasets = &DATASETS;
+
+    for dataset in datasets.iter() {
+        let mut results: Vec<Vec<_>> = Vec::with_capacity(dataset.raw_data().len());
+
+        for i in 1..dataset.roaring_rs_bitmaps().len() {
+            let bm1 = dataset.roaring_rs_bitmaps().get(i - 1).expect("data error");
+            let bm2 = dataset.roaring_rs_bitmaps().get(i).expect("data error");
+
+            results.push(bm1.bitand(bm2).iter().collect());
+        }
+
+        assert_eq!(
+            dataset.expected_results().successive_intersections(),
+            results
+        );
+    }
+}
+
+#[test]
+fn it_computes_successive_unions() {
+    let datasets = &DATASETS;
+
+    for dataset in datasets.iter() {
+        let mut results: Vec<Vec<_>> = Vec::with_capacity(dataset.raw_data().len());
+
+        for i in 1..dataset.roaring_rs_bitmaps().len() {
+            let bm1 = dataset.roaring_rs_bitmaps().get(i - 1).expect("data error");
+            let bm2 = dataset.roaring_rs_bitmaps().get(i).expect("data error");
+
+            results.push(bm1.bitor(bm2).iter().collect());
+        }
+
+        assert_eq!(dataset.expected_results().successive_unions(), results);
+    }
+}
+
+#[test]
+fn it_computes_collective_union() {
+    let datasets = &DATASETS;
+
+    for dataset in datasets.iter() {
+        let result: Vec<_> = dataset.roaring_rs_bitmaps().union().iter().collect();
+
+        assert_eq!(result, dataset.expected_results().collective_union())
     }
 }
