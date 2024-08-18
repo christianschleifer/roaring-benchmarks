@@ -1,14 +1,14 @@
-use std::fs::File;
-use std::io::BufRead;
-use std::io::BufReader;
-use std::path::PathBuf;
-use std::sync::LazyLock;
-use std::time::Instant;
-
+use crate::dataset::parse::parse_datasets;
 use croaring::Bitmap;
+use expected_results::ExpectedResults;
 use roaring::RoaringBitmap;
-use tracing::info;
-use zip::ZipArchive;
+use statistics::Statistics;
+use std::collections::BTreeSet;
+use std::sync::LazyLock;
+
+pub(crate) mod expected_results;
+mod parse;
+pub(crate) mod statistics;
 
 const DATASET_FILENAMES: &[&str] = &[
     "census-income.zip",
@@ -22,79 +22,60 @@ const DATASET_FILENAMES: &[&str] = &[
 ];
 
 pub static DATASETS: LazyLock<Vec<Dataset>> =
-    LazyLock::new(|| parse_datasets().expect("could not parse datasets"));
+    LazyLock::new(|| parse_datasets(DATASET_FILENAMES).expect("could not parse datasets"));
 
 pub struct Dataset {
     name: String,
-    data: Vec<Vec<u32>>,
+    raw_data: Vec<BTreeSet<u32>>,
+    croaring_bitmaps: Vec<Bitmap>,
+    roaring_rs_bitmaps: Vec<RoaringBitmap>,
+    statistics: Statistics,
+    expected_results: ExpectedResults,
 }
 
 impl Dataset {
+    pub(crate) fn new(name: String, raw_data: Vec<BTreeSet<u32>>) -> Self {
+        let statistics = Statistics::new(&raw_data);
+        let expected_results = ExpectedResults::new(&raw_data, &statistics);
+
+        let croaring_bitmaps = raw_data
+            .iter()
+            .map(|set| Bitmap::from(set.iter().copied().collect::<Vec<_>>().as_slice()))
+            .collect();
+
+        let roaring_rs_bitmaps = raw_data.iter().map(RoaringBitmap::from_iter).collect();
+
+        Self {
+            name,
+            raw_data,
+            croaring_bitmaps,
+            roaring_rs_bitmaps,
+            statistics,
+            expected_results,
+        }
+    }
+
     pub fn name(&self) -> &str {
         &self.name
     }
 
-    pub fn data(&self) -> &[Vec<u32>] {
-        &self.data
+    pub fn raw_data(&self) -> &[BTreeSet<u32>] {
+        &self.raw_data
     }
 
-    pub fn to_croaring_bitmaps(&self) -> Vec<croaring::Bitmap> {
-        self.data
-            .iter()
-            .map(|vec| Bitmap::from(vec.as_slice()))
-            .collect()
+    pub fn croaring_bitmaps(&self) -> &[Bitmap] {
+        &self.croaring_bitmaps
     }
 
-    pub fn to_roaring_bitmaps(&self) -> Vec<roaring::RoaringBitmap> {
-        self.data.iter().map(RoaringBitmap::from_iter).collect()
-    }
-}
-
-fn parse_datasets() -> anyhow::Result<Vec<Dataset>> {
-    let start = Instant::now();
-    let mut datasets = Vec::new();
-
-    for dataset_filename in DATASET_FILENAMES {
-        let dataset_file = File::open(PathBuf::from(format!(
-            "{}/real-roaring-datasets/{}",
-            env!("CARGO_MANIFEST_DIR"),
-            dataset_filename
-        )))?;
-
-        let mut zip_archive = ZipArchive::new(dataset_file)?;
-        let data = process_zip_archive(&mut zip_archive)?;
-
-        datasets.push(Dataset {
-            name: dataset_filename.to_string(),
-            data,
-        });
+    pub fn roaring_rs_bitmaps(&self) -> &[RoaringBitmap] {
+        &self.roaring_rs_bitmaps
     }
 
-    let elapsed = start.elapsed().as_millis();
-
-    info!("parsing all datasets took {} milliseconds", elapsed);
-
-    Ok(datasets)
-}
-
-fn process_zip_archive(zip: &mut ZipArchive<File>) -> anyhow::Result<Vec<Vec<u32>>> {
-    let mut data = Vec::with_capacity(zip.len());
-
-    for i in 0..zip.len() {
-        let zip_file = zip.by_index(i)?;
-        let buf_reader = BufReader::new(zip_file);
-
-        let mut indices_of_set_bits = Vec::new();
-        for result in buf_reader.split(b',') {
-            let bytes = result?;
-
-            let index = String::from_utf8(bytes)?;
-            let index = index.trim().parse::<u32>()?;
-            indices_of_set_bits.push(index);
-        }
-
-        data.push(indices_of_set_bits);
+    pub fn statistics(&self) -> &Statistics {
+        &self.statistics
     }
 
-    Ok(data)
+    pub fn expected_results(&self) -> &ExpectedResults {
+        &self.expected_results
+    }
 }

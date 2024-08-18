@@ -2,6 +2,7 @@
 name = "roaring-benchmarks"
 version = "0.1.0"
 edition = "2021"
+publish = false
 
 [dependencies]
 anyhow = "1"
@@ -12,5 +13,9 @@ tracing = "0.1"
 zip = "2"
 
 [[bench]]
-name = "multi_union"
+name = "contains"
 harness = false
+
+[package.metadata.cargo-udeps.ignore]
+normal = ["criterion"]
+
