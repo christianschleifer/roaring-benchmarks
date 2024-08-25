@@ -28,7 +28,7 @@ pub struct Dataset {
     name: String,
     raw_data: Vec<BTreeSet<u32>>,
     croaring_bitmaps: Vec<Bitmap>,
-    roaring_rs_bitmaps: Vec<RoaringBitmap>,
+    roaring_bitmaps: Vec<RoaringBitmap>,
     statistics: Statistics,
     expected_results: ExpectedResults,
 }
@@ -43,13 +43,13 @@ impl Dataset {
             .map(|set| Bitmap::from(set.iter().copied().collect::<Vec<_>>().as_slice()))
             .collect();
 
-        let roaring_rs_bitmaps = raw_data.iter().map(RoaringBitmap::from_iter).collect();
+        let roaring_bitmaps = raw_data.iter().map(RoaringBitmap::from_iter).collect();
 
         Self {
             name,
             raw_data,
             croaring_bitmaps,
-            roaring_rs_bitmaps,
+            roaring_bitmaps,
             statistics,
             expected_results,
         }
@@ -67,8 +67,8 @@ impl Dataset {
         &self.croaring_bitmaps
     }
 
-    pub fn roaring_rs_bitmaps(&self) -> &[RoaringBitmap] {
-        &self.roaring_rs_bitmaps
+    pub fn roaring_bitmaps(&self) -> &[RoaringBitmap] {
+        &self.roaring_bitmaps
     }
 
     pub fn statistics(&self) -> &Statistics {

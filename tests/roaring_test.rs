@@ -15,7 +15,7 @@ fn it_computes_contains() {
         let mut second_quartile_results = Vec::with_capacity(dataset.raw_data().len());
         let mut third_quartile_results = Vec::with_capacity(dataset.raw_data().len());
 
-        let bms = dataset.roaring_rs_bitmaps();
+        let bms = dataset.roaring_bitmaps();
 
         for bm in bms {
             first_quartile_results.push(bm.contains(first_quartile));
@@ -45,9 +45,9 @@ fn it_computes_successive_intersections() {
     for dataset in datasets.iter() {
         let mut results: Vec<Vec<_>> = Vec::with_capacity(dataset.raw_data().len());
 
-        for i in 1..dataset.roaring_rs_bitmaps().len() {
-            let bm1 = dataset.roaring_rs_bitmaps().get(i - 1).expect("data error");
-            let bm2 = dataset.roaring_rs_bitmaps().get(i).expect("data error");
+        for i in 1..dataset.roaring_bitmaps().len() {
+            let bm1 = dataset.roaring_bitmaps().get(i - 1).expect("data error");
+            let bm2 = dataset.roaring_bitmaps().get(i).expect("data error");
 
             results.push(bm1.bitand(bm2).iter().collect());
         }
@@ -66,9 +66,9 @@ fn it_computes_successive_unions() {
     for dataset in datasets.iter() {
         let mut results: Vec<Vec<_>> = Vec::with_capacity(dataset.raw_data().len());
 
-        for i in 1..dataset.roaring_rs_bitmaps().len() {
-            let bm1 = dataset.roaring_rs_bitmaps().get(i - 1).expect("data error");
-            let bm2 = dataset.roaring_rs_bitmaps().get(i).expect("data error");
+        for i in 1..dataset.roaring_bitmaps().len() {
+            let bm1 = dataset.roaring_bitmaps().get(i - 1).expect("data error");
+            let bm2 = dataset.roaring_bitmaps().get(i).expect("data error");
 
             results.push(bm1.bitor(bm2).iter().collect());
         }
@@ -82,7 +82,7 @@ fn it_computes_collective_union() {
     let datasets = &DATASETS;
 
     for dataset in datasets.iter() {
-        let result: Vec<_> = dataset.roaring_rs_bitmaps().union().iter().collect();
+        let result: Vec<_> = dataset.roaring_bitmaps().union().iter().collect();
 
         assert_eq!(result, dataset.expected_results().collective_union())
     }

@@ -36,11 +36,11 @@ fn contains(c: &mut Criterion) {
             },
         );
 
-        let roaring_rs_bms = dataset.roaring_rs_bitmaps();
+        let roaring_bms = dataset.roaring_bitmaps();
 
         group.bench_with_input(
-            BenchmarkId::new("roaring-rs", dataset.name()),
-            &(roaring_rs_bms, (first_quartile_value, second_quartile_value, third_quartile_value)),
+            BenchmarkId::new("roaring", dataset.name()),
+            &(roaring_bms, (first_quartile_value, second_quartile_value, third_quartile_value)),
             |bencher, (bitmaps, (first_quartile_value, second_quartile_value, third_quartile_value))| {
                 bencher.iter(|| {
                     for bitmap in *bitmaps {
@@ -77,11 +77,11 @@ fn successive_intersections(c: &mut Criterion) {
             },
         );
 
-        let roaring_rs_bms = dataset.roaring_rs_bitmaps();
+        let roaring_bms = dataset.roaring_bitmaps();
 
         group.bench_with_input(
-            BenchmarkId::new("roaring-rs", dataset.name()),
-            &roaring_rs_bms,
+            BenchmarkId::new("roaring", dataset.name()),
+            &roaring_bms,
             |bencher, bitmaps| {
                 bencher.iter(|| {
                     for i in 1..bitmaps.len() {
@@ -119,11 +119,11 @@ fn successive_unions(c: &mut Criterion) {
             },
         );
 
-        let roaring_rs_bms = dataset.roaring_rs_bitmaps();
+        let roaring_bms = dataset.roaring_bitmaps();
 
         group.bench_with_input(
-            BenchmarkId::new("roaring-rs", dataset.name()),
-            &roaring_rs_bms,
+            BenchmarkId::new("roaring", dataset.name()),
+            &roaring_bms,
             |bencher, bitmaps| {
                 bencher.iter(|| {
                     for i in 1..bitmaps.len() {
@@ -156,11 +156,11 @@ fn collective_union(c: &mut Criterion) {
             },
         );
 
-        let roaring_rs_bms = dataset.roaring_rs_bitmaps();
+        let roaring_bms = dataset.roaring_bitmaps();
 
         group.bench_with_input(
-            BenchmarkId::new("roaring-rs", dataset.name()),
-            &roaring_rs_bms,
+            BenchmarkId::new("roaring", dataset.name()),
+            &roaring_bms,
             |bencher, bitmaps| {
                 bencher.iter(|| {
                     let _ = bitmaps.union();
