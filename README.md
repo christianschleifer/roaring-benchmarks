@@ -48,19 +48,18 @@ ARM: [m6g.metal](https://aws.amazon.com/ec2/instance-types/m6g/)
 
 #### croaring with SIMD vs. roaring without SIMD
 
-x86: https://christianschleifer.github.io/benchmarks/roaring-bitmaps/x86/m6a-metal/report/index.html
+x86: https://christianschleifer.github.io/benchmarks/roaring-bitmaps/x86/m6a-metal/croaring-with-simd-roaring-without-simd/report/index.html
 
-ARM: https://christianschleifer.github.io/benchmarks/roaring-bitmaps/arm/m6g-metal/report/index.html
+ARM: https://christianschleifer.github.io/benchmarks/roaring-bitmaps/arm/m6g-metal/croaring-with-simd-roaring-without-simd/report/index.html
+
+####  croaring with SIMD vs. roaring with SIMD 
+
+x86: https://christianschleifer.github.io/benchmarks/roaring-bitmaps/x86/m6a-metal/croaring-with-simd-roaring-with-simd/report/index.html
+
+ARM: https://christianschleifer.github.io/benchmarks/roaring-bitmaps/arm/m6g-metal/croaring-with-simd-roaring-with-simd/report/index.html
 
 ####   
 
-x86:
-
-ARM:
-
-####   
-
-TODO: croaring with SIMD vs. roaring with SIMD
 TODO: croaring without SIMD vs. roaring without SIMD
 TODO: Use croaring RunContainers via `.run_optimize` and compare with croaring
 without `.run_optimize`.

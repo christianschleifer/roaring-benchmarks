@@ -8,7 +8,7 @@ publish = false
 anyhow = "1"
 criterion = { version = "0.5", features = ["html_reports"] }
 croaring = "2"
-roaring = "0.10"
+roaring = { version = "0.10" , features = ["simd"]}
 tracing = "0.1"
 zip = "2"
 
